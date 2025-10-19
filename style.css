@@ -124,3 +124,38 @@ li:hover {
 .task-actions button:hover {
   opacity: 0.85;
 }
+#sort-toolbar {
+  margin-top: 20px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 10px 15px;
+  border-radius: 5px;
+  box-shadow: 2px 5px 5px #333;
+}
+
+#sort-toolbar h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+.sort-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.sort-buttons button {
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sort-buttons button:hover {
+  background-color: #555;
+}
