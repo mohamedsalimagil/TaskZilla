@@ -45,51 +45,57 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     li.prepend(checkbox);
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "x";
-    deleteBtn.style.marginLeft = "10px";
-    deleteBtn.style.backgroundColor = "crimson";
-    deleteBtn.style.color = "white";
-    deleteBtn.style.border = "lightblue";
-    deleteBtn.style.cursor = "pointer";
-    deleteBtn.addEventListener("click", () => {
-      fetch(`${BASE_URL}/${task.id}`, {
-        method: "DELETE"
-      }).then(() => li.remove());
-    });
-    
+    const actionMenuBtn = document.createElement("button");
+actionMenuBtn.textContent = "⋮";
+actionMenuBtn.className = "action-menu";
 
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit";
-    editBtn.style.marginLeft = "10px";
-    editBtn.style.backgroundColor = "navy";
-    editBtn.style.color = "white";
-    editBtn.style.border = "yellow";
-    editBtn.style.cursor = "pointer";
-    editBtn.addEventListener("click", () => {
-      const newTask = prompt("Edit task:", task.description);
-      const newDate = prompt("Edit due date:", task.dueDate);
-      const newUser = prompt("Edit assigned user:", task.assignedUser);
-      if (newTask && newDate && newUser) {
-        fetch(`${BASE_URL}/${task.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            description: newTask,
-            dueDate: newDate,
-            assignedUser: newUser
-          })
-        }).then(() => {
-          li.childNodes[1].nodeValue = `${newTask} (Due: ${newDate})- Assigned to: ${newUser}`;
-          li.setAttribute("data-due-date", newDate);
-        });
-      }
+const menu = document.createElement("div");
+menu.className = "action-dropdown";
+menu.style.display = "none";
+
+// ✅ Edit option
+const editOption = document.createElement("button");
+editOption.textContent = "✏️ Edit";
+editOption.addEventListener("click", () => {
+  const newTask = prompt("Edit task:", task.description);
+  const newDate = prompt("Edit due date:", task.dueDate);
+  const newUser = prompt("Edit assigned user:", task.assignedUser);
+  if (newTask && newDate && newUser) {
+    fetch(`${BASE_URL}/${task.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        description: newTask,
+        dueDate: newDate,
+        assignedUser: newUser
+      })
+    }).then(() => {
+      li.childNodes[1].nodeValue = `${newTask} (Due: ${newDate})- Assigned to: ${newUser}`;
+      li.setAttribute("data-due-date", newDate);
     });
-    const buttonGroup = document.createElement("div");
-  buttonGroup.className = "task-actions";
-  buttonGroup.appendChild(editBtn);
-  buttonGroup.appendChild(deleteBtn);
-  li.appendChild(buttonGroup);
+  }
+  menu.style.display = "none";
+});
+
+// ✅ Delete option
+const deleteOption = document.createElement("button");
+deleteOption.textContent = "❌ Delete";
+deleteOption.addEventListener("click", () => {
+  fetch(`${BASE_URL}/${task.id}`, {
+    method: "DELETE"
+  }).then(() => li.remove());
+  menu.style.display = "none";
+});
+
+menu.appendChild(editOption);
+menu.appendChild(deleteOption);
+
+actionMenuBtn.addEventListener("click", () => {
+  menu.style.display = menu.style.display === "none" ? "block" : "none";
+});
+
+li.appendChild(actionMenuBtn);
+li.appendChild(menu);
 
 
 
