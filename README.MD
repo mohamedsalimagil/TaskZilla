@@ -1,0 +1,70 @@
+## TaskZilla Lite
+
+TaskZilla Lite is a lightweight task management application that allows users to create, organize, update, and remove tasks with ease. It supports task assignments, customizable priority levels, completion tracking, editing, deletion, and sorting. The app works both online using a hosted backend and locally on a developer’s machine.
+
+## Live Demo
+You can use TaskZilla Lite immediately without any setup:  
+https://mohamedsalimagil.github.io/TaskZilla/
+
+Tasks created on the live site are saved online using the Render backend.
+
+## Real-World Use Case
+TaskZilla Lite helps individuals and small teams manage daily tasks more effectively by centralizing responsibilities, deadlines, and progress. Instead of relying on scattered notes or memory, users can assign tasks, prioritize their work, set due dates, and track completion in one place. It removes guesswork around responsibility, reduces forgetfulness, and improves task visibility.
+
+## Features
+- Create tasks with a description
+- Assign a task to any user by name
+- Set a due date for each task
+- Choose priority levels: low, medium, or high
+- Mark tasks as complete by checking the box (tasks get underlined to indicate completion)
+- Edit existing tasks directly
+- Delete tasks you no longer need
+- Sort tasks by priority
+- Sort tasks by due date
+- All-in-one interface for efficient task control
+
+## Technologies Used
+- HTML, CSS, JavaScript for the frontend
+- JSON Server or Render backend for data handling
+- GitHub Pages for live deployment
+
+## How to Use the App
+
+### Option 1: Use the Live Hosted Version (No Installation)
+Visit the hosted site:  
+https://mohamedsalimagil.github.io/TaskZilla/
+
+All tasks created will be stored on the live Render backend.
+
+### Option 2: Run Locally on Your Machine
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/mohamedsalimagil/TaskZilla.git
+   cd TaskZilla
+   ```
+
+2. Make sure you have Node.js and npm installed.
+
+3. Install dependencies:
+   ```
+   npm install
+   ```
+
+4. Start a local JSON server:
+   ```
+   npx json-server --watch db.json --port 3000
+   ```
+
+5. Open `index.html` in your browser (e.g., right-click and select **Open with Live Server** in VS Code or open the file directly).
+
+6. The app will interact with:
+   ```
+   http://localhost:3000/tasks
+   ```
+
+## Author
+Mohamed Salim Agil
+
+## License
+This project is licensed under the MIT License. You are free to use, modify, and distribute the software in accordance with the license terms.
