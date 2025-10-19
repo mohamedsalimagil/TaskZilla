@@ -26,6 +26,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (task.priority === "high") li.style.color = "red";
     else if (task.priority === "medium") li.style.color = "orange";
     else if (task.priority === "low") li.style.color = "green";
+    const badge = document.createElement("span");
+    badge.classList.add("priority-badge", `priority-${task.priority}`);
+    badge.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+    li.appendChild(badge);
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
