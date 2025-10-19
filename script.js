@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "DELETE"
       }).then(() => li.remove());
     });
-    li.appendChild(deleteBtn);
+    
 
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
@@ -85,7 +85,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     });
-    li.appendChild(editBtn);
+    const buttonGroup = document.createElement("div");
+  buttonGroup.className = "task-actions";
+  buttonGroup.appendChild(editBtn);
+  buttonGroup.appendChild(deleteBtn);
+  li.appendChild(buttonGroup);
+
+
 
     taskList.appendChild(li);
   }

@@ -75,3 +75,52 @@ li:hover {
   transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
+#sort-toolbar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+#sort-toolbar button {
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#sort-toolbar button:hover {
+  background-color: #005fa3;
+}
+.task-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.task-actions button {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.task-actions button.edit {
+  background-color: navy;
+  color: white;
+}
+
+.task-actions button.delete {
+  background-color: crimson;
+  color: white;
+}
+
+.task-actions button:hover {
+  opacity: 0.85;
+}
