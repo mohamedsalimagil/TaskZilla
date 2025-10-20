@@ -163,6 +163,7 @@ li:hover {
   background: none;
   border: none;
   font-size: 18px;
+  color: black; /* 👈 This makes the dots black */
   cursor: pointer;
   margin-left: 10px;
 }
@@ -180,18 +181,14 @@ li:hover {
 .action-dropdown button {
   display: block;
   width: 100%;
-  background-color: #007acc; /* Deep blue for visibility */
-  color: white;
+  background: none;
   border: none;
   padding: 6px 10px;
   text-align: left;
   cursor: pointer;
   font-size: 14px;
-  border-radius: 4px;
-  margin-bottom: 6px;
-  transition: background-color 0.3s ease;
 }
 
 .action-dropdown button:hover {
-  background-color: #005fa3; /* Slightly darker on hover */
+  background-color: #f0f0f0;
 }
