@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ✅ Auto-close dropdown when clicking outside
+//  Auto-close dropdown when clicking outside
 document.addEventListener("click", (event) => {
   const allMenus = document.querySelectorAll(".action-dropdown");
   allMenus.forEach(menu => {

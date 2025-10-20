@@ -168,12 +168,12 @@ li:hover {
   z-index: 10;
 }
 
-/* ✅ Updated dropdown button styles */
+
 .action-dropdown button {
   display: block;
   width: 100%;
-  background-color: #007acc; /* Solid background for visibility */
-  color: white;              /* White text for contrast */
+  background-color: #007acc; 
+  color: white;              
   border: none;
   padding: 6px 10px;
   text-align: left;
@@ -185,7 +185,7 @@ li:hover {
 }
 
 .action-dropdown button:hover {
-  background-color: #005fa3; /* Slightly darker on hover */
+  background-color: #005fa3; 
 }
 li.task-item {
   display: flex;
@@ -222,12 +222,22 @@ li.task-item {
 }
 li {
   position: relative;
-  z-index: 1; /* ✅ Base layer */
+  z-index: 1; 
   transition: all 0.3s ease;
 }
 
 li:hover {
   transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  z-index: 2; /* ✅ Slightly elevated, but below dropdown */
+  z-index: 2; 
+}
+.task-item {
+  background: #fff;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
