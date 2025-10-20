@@ -46,6 +46,7 @@ button:hover {
   border-radius: 5px;
   box-shadow: 2px 5px 5px #333;
 }
+
 .priority-badge {
   display: inline-block;
   padding: 2px 8px;
@@ -67,6 +68,7 @@ button:hover {
 .priority-low {
   background-color: green;
 }
+
 li {
   transition: all 0.3s ease;
 }
@@ -75,56 +77,12 @@ li:hover {
   transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
+
 #sort-toolbar {
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-bottom: 15px;
-}
-
-#sort-toolbar button {
-  font-size: 14px;
-  padding: 6px 12px;
-  border-radius: 4px;
-  background-color: #007acc;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-#sort-toolbar button:hover {
-  background-color: #005fa3;
-}
-.task-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.task-actions button {
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.task-actions button.edit {
-  background-color: navy;
-  color: white;
-}
-
-.task-actions button.delete {
-  background-color: crimson;
-  color: white;
-}
-
-.task-actions button:hover {
-  opacity: 0.85;
-}
-#sort-toolbar {
   margin-top: 20px;
   text-align: center;
   background: rgba(255, 255, 255, 0.3);
@@ -159,17 +117,49 @@ li:hover {
 .sort-buttons button:hover {
   background-color: #555;
 }
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.task-actions button {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.task-actions button.edit {
+  background-color: navy;
+  color: white;
+}
+
+.task-actions button.delete {
+  background-color: crimson;
+  color: white;
+}
+
+.task-actions button:hover {
+  opacity: 0.85;
+}
+
 .action-menu {
   background: none;
   border: none;
   font-size: 18px;
-  color: black; /* 👈 This makes the dots black */
+  color: black;
   cursor: pointer;
   margin-left: 10px;
 }
 
 .action-dropdown {
   position: absolute;
+  right: 0;
+  top: 100%;
   background: white;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -178,17 +168,55 @@ li:hover {
   z-index: 10;
 }
 
+/* ✅ Updated dropdown button styles */
 .action-dropdown button {
   display: block;
   width: 100%;
-  background: none;
+  background-color: #007acc; /* Solid background for visibility */
+  color: white;              /* White text for contrast */
   border: none;
   padding: 6px 10px;
   text-align: left;
   cursor: pointer;
   font-size: 14px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  transition: background-color 0.3s ease;
 }
 
 .action-dropdown button:hover {
-  background-color: #f0f0f0;
+  background-color: #005fa3; /* Slightly darker on hover */
+}
+li.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.task-content {
+  flex-grow: 1;
+  padding-right: 10px;
+}
+
+.task-controls {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.action-dropdown {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
+  min-width: 120px;
 }

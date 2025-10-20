@@ -19,88 +19,100 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Render a task
   function renderTask(task) {
-    const li = document.createElement("li");
-    li.textContent = `${task.description} (Due: ${task.dueDate})- Assigned to: ${task.assignedUser}`;
-    li.setAttribute("data-due-date", task.dueDate);
+  const li = document.createElement("li");
+  li.className = "task-item";
+  li.setAttribute("data-due-date", task.dueDate);
+  li.style.position = "relative";
 
-    if (task.priority === "high") li.style.color = "red";
-    else if (task.priority === "medium") li.style.color = "orange";
-    else if (task.priority === "low") li.style.color = "green";
-    const badge = document.createElement("span");
-    badge.classList.add("priority-badge", `priority-${task.priority}`);
-    badge.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
-    li.appendChild(badge);
+  // Apply priority color
+  if (task.priority === "high") li.style.color = "red";
+  else if (task.priority === "medium") li.style.color = "orange";
+  else if (task.priority === "low") li.style.color = "green";
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = task.completed;
-    checkbox.style.marginRight = "10px";
-    checkbox.addEventListener("change", () => {
-      li.style.textDecoration = checkbox.checked ? "line-through" : "none";
-      fetch(`${BASE_URL}/${task.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ completed: checkbox.checked })
-      });
-    });
-    li.prepend(checkbox);
+  // Task content container
+  const taskContent = document.createElement("div");
+  taskContent.className = "task-content";
+  taskContent.textContent = `${task.description} (Due: ${task.dueDate}) - Assigned to: ${task.assignedUser}`;
 
-    const actionMenuBtn = document.createElement("button");
-actionMenuBtn.textContent = "⋮";
-actionMenuBtn.className = "action-menu";
+  const badge = document.createElement("span");
+  badge.classList.add("priority-badge", `priority-${task.priority}`);
+  badge.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+  taskContent.appendChild(badge);
 
-const menu = document.createElement("div");
-menu.className = "action-dropdown";
-menu.style.display = "none";
-
-// ✅ Edit option
-const editOption = document.createElement("button");
-editOption.textContent = "✏️ Edit";
-editOption.addEventListener("click", () => {
-  const newTask = prompt("Edit task:", task.description);
-  const newDate = prompt("Edit due date:", task.dueDate);
-  const newUser = prompt("Edit assigned user:", task.assignedUser);
-  if (newTask && newDate && newUser) {
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = task.completed;
+  checkbox.style.marginRight = "10px";
+  checkbox.addEventListener("change", () => {
+    taskContent.style.textDecoration = checkbox.checked ? "line-through" : "none";
     fetch(`${BASE_URL}/${task.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        description: newTask,
-        dueDate: newDate,
-        assignedUser: newUser
-      })
-    }).then(() => {
-      li.childNodes[1].nodeValue = `${newTask} (Due: ${newDate})- Assigned to: ${newUser}`;
-      li.setAttribute("data-due-date", newDate);
+      body: JSON.stringify({ completed: checkbox.checked })
     });
-  }
+  });
+
+  // Action menu button
+  const actionMenuBtn = document.createElement("button");
+  actionMenuBtn.textContent = "⋮";
+  actionMenuBtn.className = "action-menu";
+
+  // Dropdown menu
+  const menu = document.createElement("div");
+  menu.className = "action-dropdown";
   menu.style.display = "none";
-});
 
-// ✅ Delete option
-const deleteOption = document.createElement("button");
-deleteOption.textContent = "❌ Delete";
-deleteOption.addEventListener("click", () => {
-  fetch(`${BASE_URL}/${task.id}`, {
-    method: "DELETE"
-  }).then(() => li.remove());
-  menu.style.display = "none";
-});
+  const editOption = document.createElement("button");
+  editOption.textContent = "✏️ Edit Task";
+  editOption.addEventListener("click", () => {
+    const newTask = prompt("Edit task:", task.description);
+    const newDate = prompt("Edit due date:", task.dueDate);
+    const newUser = prompt("Edit assigned user:", task.assignedUser);
+    if (newTask && newDate && newUser) {
+      fetch(`${BASE_URL}/${task.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description: newTask,
+          dueDate: newDate,
+          assignedUser: newUser
+        })
+      }).then(() => {
+        taskContent.textContent = `${newTask} (Due: ${newDate}) - Assigned to: ${newUser}`;
+        taskContent.appendChild(badge);
+        li.setAttribute("data-due-date", newDate);
+      });
+    }
+    menu.style.display = "none";
+  });
 
-menu.appendChild(editOption);
-menu.appendChild(deleteOption);
+  const deleteOption = document.createElement("button");
+  deleteOption.textContent = "❌ Delete Task";
+  deleteOption.addEventListener("click", () => {
+    fetch(`${BASE_URL}/${task.id}`, {
+      method: "DELETE"
+    }).then(() => li.remove());
+    menu.style.display = "none";
+  });
 
-actionMenuBtn.addEventListener("click", () => {
-  menu.style.display = menu.style.display === "none" ? "block" : "none";
-});
+  menu.appendChild(editOption);
+  menu.appendChild(deleteOption);
 
-li.appendChild(actionMenuBtn);
-li.appendChild(menu);
+  actionMenuBtn.addEventListener("click", () => {
+    menu.style.display = menu.style.display === "none" ? "block" : "none";
+  });
 
+  const rightSide = document.createElement("div");
+  rightSide.className = "task-controls";
+  rightSide.appendChild(actionMenuBtn);
+  rightSide.appendChild(menu);
 
+  li.appendChild(checkbox);
+  li.appendChild(taskContent);
+  li.appendChild(rightSide);
 
-    taskList.appendChild(li);
-  }
+  taskList.appendChild(li);
+}
 
   // Submit new task
   form.addEventListener("submit", function (event) {
@@ -153,5 +165,16 @@ li.appendChild(menu);
     tasks.sort((a, b) => getPriorityValue(a) - getPriorityValue(b));
     taskList.innerHTML = "";
     tasks.forEach(task => taskList.appendChild(task));
+  });
+});
+
+// ✅ Auto-close dropdown when clicking outside
+document.addEventListener("click", (event) => {
+  const allMenus = document.querySelectorAll(".action-dropdown");
+  allMenus.forEach(menu => {
+    const toggleButton = menu.previousElementSibling;
+    if (!menu.contains(event.target) && !toggleButton.contains(event.target)) {
+      menu.style.display = "none";
+    }
   });
 });
