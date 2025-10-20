@@ -220,3 +220,14 @@ li.task-item {
   z-index: 9999;
   min-width: 120px;
 }
+li {
+  position: relative;
+  z-index: 1; /* ✅ Base layer */
+  transition: all 0.3s ease;
+}
+
+li:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 2; /* ✅ Slightly elevated, but below dropdown */
+}
