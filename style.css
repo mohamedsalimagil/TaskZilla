@@ -241,3 +241,58 @@ li:hover {
   justify-content: space-between;
   align-items: center;
 }
+/* --- Cleaner, lighter, better integrated form --- */
+#create-task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.25); /* translucent to match background */
+  padding: 10px 12px;
+  border-radius: 6px;
+  box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 450px; /* narrower for balance */
+  margin: 0 auto; /* center it */
+}
+
+.form-row {
+  display: flex;
+  gap: 8px;
+}
+
+.form-row input,
+.form-row select {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 5px;
+  border: 1px solid #888;
+  font-size: 13px;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+#add-task-btn {
+  background: #007acc;
+  border: none;
+  color: white;
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  align-self: center;
+  width: 50%;
+}
+
+#add-task-btn:hover {
+  background: #005fa3;
+}
+
+/* Responsive tweak: stack fields on small screens */
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
+  #add-task-btn {
+    width: 100%;
+  }
+}
