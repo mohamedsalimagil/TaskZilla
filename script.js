@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const quoteAuthor = document.getElementById("quote-author");
 
     try {
-      const response = await fetch("https://api.quotable.io/random", {
+      const response = await fetch("https://zenquotes.io/api/random", {
         headers: {
           "Accept": "application/json"
         }
