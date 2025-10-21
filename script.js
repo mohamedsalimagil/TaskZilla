@@ -178,3 +178,29 @@ document.addEventListener("click", (event) => {
     }
   });
 });
+
+// ---- Dynamic Quote Section ----
+document.addEventListener("DOMContentLoaded", () => {
+  async function fetchQuote() {
+    try {
+      const res = await fetch("https://api.quotable.io/random", {
+        headers: { "Accept": "application/json" },
+      });
+      if (!res.ok) throw new Error(`HTTP error! ${res.status}`);
+
+      const data = await res.json();
+
+      document.getElementById("footer-quote").textContent = `"${data.content}"`;
+      document.getElementById("footer-author").textContent = `— ${data.author}`;
+    } catch (error) {
+      console.error("Error fetching quote:", error);
+      document.getElementById("footer-quote").textContent =
+        "Couldn’t load quote 😅";
+      document.getElementById("footer-author").textContent = "";
+    }
+  }
+
+  fetchQuote();
+});
+
+
