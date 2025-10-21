@@ -56,7 +56,6 @@ https://mohamedsalimagil.github.io/TaskZilla/
 All tasks created will be stored on the live Render backend.
 
 ### Option 2: Run Locally on Your Machine
-
 Clone the repository:
 ```bash
 git clone https://github.com/mohamedsalimagil/TaskZilla.git
@@ -68,6 +67,7 @@ Make sure you have Node.js and npm installed.
 Install dependencies:
 ```bash
 npm install
+npm install node-fetch
 ```
 
 Start a local JSON server (or run your full backend with quotes):
