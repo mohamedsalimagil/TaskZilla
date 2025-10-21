@@ -180,64 +180,51 @@ document.addEventListener("click", (event) => {
 });
 
 // ---- Dynamic Quote Section ----
-// ---- Dynamic Quote Section ----
-document.addEventListener("DOMContentLoaded", () => {
+// USING YOUR RENDER BACKEND AS PROXY
+document.addEventListener("DOMContentLoaded", function() {
+  const quoteText = document.getElementById("footer-quote");
+  const quoteAuthor = document.getElementById("footer-author");
+
+  // REPLACE THIS WITH YOUR ACTUAL RENDER URL
+  const RENDER_BACKEND_URL = "https://taskzilla-vz2d.onrender.com"; // Your actual URL from Render
+
   async function fetchQuote() {
-    const quoteText = document.getElementById("quote-text");
-    const quoteAuthor = document.getElementById("quote-author");
-
-    // Fallback quotes in case API fails
-    const fallbackQuotes = [
-      { q: "The way to get started is to quit talking and begin doing.", a: "Walt Disney" },
-      { q: "Life is what happens when you're busy making other plans.", a: "John Lennon" },
-      { q: "The future belongs to those who believe in the beauty of their dreams.", a: "Eleanor Roosevelt" }
-    ];
-
     try {
-      // Try ZenQuotes first
-      const response = await fetch("https://zenquotes.io/api/random");
+      console.log('Fetching quote from backend...');
       
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
+      // Call your Render backend quote endpoint
+      const response = await fetch(`${RENDER_BACKEND_URL}/api/quote`);
+      
+      if (!response.ok) {
+        throw new Error(`Backend responded with status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('Quote data received:', data);
       
-      // ZenQuotes returns array with q and a properties
-      if (data && data[0] && data[0].q) {
-        quoteText.textContent = `"${data[0].q}"`;
-        quoteAuthor.textContent = `— ${data[0].a}`;
-      } else {
-        throw new Error("Invalid response format");
-      }
+      displayQuote(data.content, data.author);
+      
     } catch (error) {
-      console.error("Error fetching quote from ZenQuotes:", error);
-      
-      // Try alternative API
-      try {
-        const altResponse = await fetch("https://api.quotable.io/random");
-        if (altResponse.ok) {
-          const altData = await altResponse.json();
-          quoteText.textContent = `"${altData.content}"`;
-          quoteAuthor.textContent = `— ${altData.author}`;
-        } else {
-          throw new Error("Alternative API also failed");
-        }
-      } catch (altError) {
-        console.error("Error fetching from alternative API:", altError);
-        
-        // Use fallback quotes
-        const randomFallback = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
-        quoteText.textContent = `"${randomFallback.q}"`;
-        quoteAuthor.textContent = `— ${randomFallback.a}`;
-      }
+      console.error('Failed to fetch quote:', error);
+      displayQuote(
+        "Great task managers focus on productivity, not just quotes!", 
+        "TaskZilla Team"
+      );
+    }
+  }
+
+  function displayQuote(text, author) {
+    if (quoteText) {
+      quoteText.textContent = `"${text}"`;
+    }
+    if (quoteAuthor) {
+      quoteAuthor.textContent = `— ${author}`;
     }
   }
 
   // Fetch quote when page loads
   fetchQuote();
-
-  // Optional: Refresh quote every 30 seconds
-  setInterval(fetchQuote, 30000);
+  
+  // Optional: Refresh quote every 60 seconds
+  setInterval(fetchQuote, 60000);
 });
-
-
-
