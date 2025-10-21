@@ -185,8 +185,8 @@ document.addEventListener("DOMContentLoaded", function() {
   const quoteText = document.getElementById("footer-quote");
   const quoteAuthor = document.getElementById("footer-author");
 
-  // REPLACE THIS WITH YOUR ACTUAL RENDER URL
-  const RENDER_BACKEND_URL = "https://taskzilla-vz2d.onrender.com"; // Your actual URL from Render
+  
+  const RENDER_BACKEND_URL = "https://taskzilla-vz2d.onrender.com"; 
 
   async function fetchQuote() {
     try {
@@ -225,6 +225,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Fetch quote when page loads
   fetchQuote();
   
-  // Optional: Refresh quote every 60 seconds
+  // Refresh quote every 60 seconds
   setInterval(fetchQuote, 60000);
 });
