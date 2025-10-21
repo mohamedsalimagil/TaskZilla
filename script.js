@@ -180,31 +180,63 @@ document.addEventListener("click", (event) => {
 });
 
 // ---- Dynamic Quote Section ----
+// ---- Dynamic Quote Section ----
 document.addEventListener("DOMContentLoaded", () => {
   async function fetchQuote() {
     const quoteText = document.getElementById("quote-text");
     const quoteAuthor = document.getElementById("quote-author");
 
-    try {
-      const response = await fetch("https://zenquotes.io/api/random", {
-        headers: {
-          "Accept": "application/json"
-        }
-      });
+    // Fallback quotes in case API fails
+    const fallbackQuotes = [
+      { q: "The way to get started is to quit talking and begin doing.", a: "Walt Disney" },
+      { q: "Life is what happens when you're busy making other plans.", a: "John Lennon" },
+      { q: "The future belongs to those who believe in the beauty of their dreams.", a: "Eleanor Roosevelt" }
+    ];
 
+    try {
+      // Try ZenQuotes first
+      const response = await fetch("https://zenquotes.io/api/random");
+      
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
       const data = await response.json();
-      quoteText.textContent = data.content;
-      quoteAuthor.textContent = `— ${data.author}`;
+      
+      // ZenQuotes returns array with q and a properties
+      if (data && data[0] && data[0].q) {
+        quoteText.textContent = `"${data[0].q}"`;
+        quoteAuthor.textContent = `— ${data[0].a}`;
+      } else {
+        throw new Error("Invalid response format");
+      }
     } catch (error) {
-      console.error("Error fetching quote:", error);
-      quoteText.textContent = "Couldn’t load quote 😅";
-      quoteAuthor.textContent = "Try refreshing!";
+      console.error("Error fetching quote from ZenQuotes:", error);
+      
+      // Try alternative API
+      try {
+        const altResponse = await fetch("https://api.quotable.io/random");
+        if (altResponse.ok) {
+          const altData = await altResponse.json();
+          quoteText.textContent = `"${altData.content}"`;
+          quoteAuthor.textContent = `— ${altData.author}`;
+        } else {
+          throw new Error("Alternative API also failed");
+        }
+      } catch (altError) {
+        console.error("Error fetching from alternative API:", altError);
+        
+        // Use fallback quotes
+        const randomFallback = fallbackQuotes[Math.floor(Math.random() * fallbackQuotes.length)];
+        quoteText.textContent = `"${randomFallback.q}"`;
+        quoteAuthor.textContent = `— ${randomFallback.a}`;
+      }
     }
   }
 
+  // Fetch quote when page loads
   fetchQuote();
+
+  // Optional: Refresh quote every 30 seconds
+  setInterval(fetchQuote, 30000);
 });
 
 
