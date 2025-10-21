@@ -182,25 +182,30 @@ document.addEventListener("click", (event) => {
 // ---- Dynamic Quote Section ----
 document.addEventListener("DOMContentLoaded", () => {
   async function fetchQuote() {
+    const quoteText = document.getElementById("quote-text");
+    const quoteAuthor = document.getElementById("quote-author");
+
     try {
-      const res = await fetch("https://api.quotable.io/random", {
-        headers: { "Accept": "application/json" },
+      const response = await fetch("https://api.quotable.io/random", {
+        headers: {
+          "Accept": "application/json"
+        }
       });
-      if (!res.ok) throw new Error(`HTTP error! ${res.status}`);
 
-      const data = await res.json();
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      document.getElementById("footer-quote").textContent = `"${data.content}"`;
-      document.getElementById("footer-author").textContent = `— ${data.author}`;
+      const data = await response.json();
+      quoteText.textContent = data.content;
+      quoteAuthor.textContent = `— ${data.author}`;
     } catch (error) {
       console.error("Error fetching quote:", error);
-      document.getElementById("footer-quote").textContent =
-        "Couldn’t load quote 😅";
-      document.getElementById("footer-author").textContent = "";
+      quoteText.textContent = "Couldn’t load quote 😅";
+      quoteAuthor.textContent = "Try refreshing!";
     }
   }
 
   fetchQuote();
 });
+
 
 
