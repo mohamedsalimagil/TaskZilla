@@ -182,8 +182,8 @@ document.addEventListener("click", (event) => {
 // ---- Dynamic Quote Section ----
 document.addEventListener("DOMContentLoaded", function() {
   // Use the correct IDs from your HTML
-  const quoteText = document.getElementById("footer-quote");
-  const quoteAuthor = document.getElementById("footer-author");
+  const quoteText = document.getElementById("quote-text");
+  const quoteAuthor = document.getElementById("quote-author");
 
   const RENDER_BACKEND_URL = "https://taskzilla-vz2d.onrender.com";
 
@@ -234,7 +234,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Fetch quote when page loads
   fetchQuote();
 
-  
   // Refresh quote every 60 seconds
   setInterval(fetchQuote, 60000);
 });
