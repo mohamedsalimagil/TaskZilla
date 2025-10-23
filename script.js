@@ -180,60 +180,40 @@ document.addEventListener("click", (event) => {
 });
 
 // ---- Dynamic Quote Section ----
-document.addEventListener("DOMContentLoaded", function() {
-  // Use the correct IDs from your HTML
+window.addEventListener('load', function() {
+  console.log('Window fully loaded, initializing quotes...');
+  
   const quoteText = document.getElementById("quote-text");
   const quoteAuthor = document.getElementById("quote-author");
+
+  if (!quoteText || !quoteAuthor) {
+    console.error('Critical: Quote elements not found even after window.load');
+    return;
+  }
 
   const RENDER_BACKEND_URL = "https://taskzilla-vz2d.onrender.com";
 
   async function fetchQuote() {
     try {
       console.log('Fetching quote from backend...');
-      
       const response = await fetch(`${RENDER_BACKEND_URL}/api/quote`);
       
-      if (!response.ok) {
-        throw new Error(`Backend responded with status: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Status: ${response.status}`);
       
       const data = await response.json();
-      console.log('Quote data received:', data);
-      
       displayQuote(data.content, data.author);
       
     } catch (error) {
       console.error('Failed to fetch quote:', error);
-      displayQuote(
-        "Even the best systems need maintenance sometimes!", 
-        "TaskZilla Team"
-      );
+      displayQuote("Persistence conquers all challenges", "TaskZilla Wisdom");
     }
   }
 
   function displayQuote(text, author) {
-    // Debug: Check if elements exist
-    console.log('Quote element:', quoteText);
-    console.log('Author element:', quoteAuthor);
-    
-    if (quoteText) {
-      quoteText.textContent = `"${text}"`;
-      console.log('Updated quote text');
-    } else {
-      console.error('Quote element not found!');
-    }
-    
-    if (quoteAuthor) {
-      quoteAuthor.textContent = `— ${author}`;
-      console.log('Updated author text');
-    } else {
-      console.error('Author element not found!');
-    }
+    quoteText.textContent = `"${text}"`;
+    quoteAuthor.textContent = `— ${author}`;
   }
 
-  // Fetch quote when page loads
   fetchQuote();
-
-  // Refresh quote every 60 seconds
   setInterval(fetchQuote, 60000);
 });

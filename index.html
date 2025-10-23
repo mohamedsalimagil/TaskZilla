@@ -52,12 +52,26 @@
 
   <footer>
   <div id="footer-text">
-    <span id="quote-text">Loading quote...</span>  <!-- Change to quote-text -->
+    <span id="quote-text">Loading quote...</span>
     <br />
-    <small id="quote-author"></small>  <!-- Change to quote-author -->
+    <small id="quote-author"></small>
     <br />
     <small>Made with ❤️ by <a href="https://github.com/mohamedsalimagil" target="_blank">Mohamed Salim Agil</a></small>
   </div>
+  
+  <script>
+    // Simple inline quote loader
+    fetch('https://taskzilla-vz2d.onrender.com/api/quote')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('quote-text').textContent = `"${data.content}"`;
+        document.getElementById('quote-author').textContent = `— ${data.author}`;
+      })
+      .catch(error => {
+        document.getElementById('quote-text').textContent = '"The only way to do great work is to love what you do."';
+        document.getElementById('quote-author').textContent = '— Steve Jobs';
+      });
+  </script>
 </footer>
 </body>
 </html>
