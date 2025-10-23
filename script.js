@@ -180,19 +180,17 @@ document.addEventListener("click", (event) => {
 });
 
 // ---- Dynamic Quote Section ----
-// USING YOUR RENDER BACKEND AS PROXY
 document.addEventListener("DOMContentLoaded", function() {
+  // Use the correct IDs from your HTML
   const quoteText = document.getElementById("footer-quote");
   const quoteAuthor = document.getElementById("footer-author");
 
-  
-  const RENDER_BACKEND_URL = "https://taskzilla-vz2d.onrender.com"; 
+  const RENDER_BACKEND_URL = "https://taskzilla-vz2d.onrender.com";
 
   async function fetchQuote() {
     try {
       console.log('Fetching quote from backend...');
       
-      // Call your Render backend quote endpoint
       const response = await fetch(`${RENDER_BACKEND_URL}/api/quote`);
       
       if (!response.ok) {
@@ -207,23 +205,35 @@ document.addEventListener("DOMContentLoaded", function() {
     } catch (error) {
       console.error('Failed to fetch quote:', error);
       displayQuote(
-        "Great task managers focus on productivity, not just quotes!", 
+        "Even the best systems need maintenance sometimes!", 
         "TaskZilla Team"
       );
     }
   }
 
   function displayQuote(text, author) {
+    // Debug: Check if elements exist
+    console.log('Quote element:', quoteText);
+    console.log('Author element:', quoteAuthor);
+    
     if (quoteText) {
       quoteText.textContent = `"${text}"`;
+      console.log('Updated quote text');
+    } else {
+      console.error('Quote element not found!');
     }
+    
     if (quoteAuthor) {
       quoteAuthor.textContent = `— ${author}`;
+      console.log('Updated author text');
+    } else {
+      console.error('Author element not found!');
     }
   }
 
   // Fetch quote when page loads
   fetchQuote();
+
   
   // Refresh quote every 60 seconds
   setInterval(fetchQuote, 60000);
