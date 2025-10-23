@@ -7,13 +7,13 @@ html {
 body {
   min-height: 100%;
   min-width: 100%;
-  background-color: lightgreen; /* solid color instead of gradient */
+  background-color: lightgreen;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  padding-bottom: 45px; /*  ADDED: Space for fixed footer */
 }
-
 
 button {
   font-size: 12px;
@@ -173,7 +173,6 @@ li:hover {
   z-index: 10;
 }
 
-
 .action-dropdown button {
   display: block;
   width: 100%;
@@ -192,6 +191,7 @@ li:hover {
 .action-dropdown button:hover {
   background-color: #005fa3; 
 }
+
 li.task-item {
   display: flex;
   align-items: center;
@@ -225,6 +225,7 @@ li.task-item {
   z-index: 9999;
   min-width: 120px;
 }
+
 li {
   position: relative;
   z-index: 1; 
@@ -236,6 +237,7 @@ li:hover {
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   z-index: 2; 
 }
+
 .task-item {
   background: #fff;
   padding: 12px;
@@ -246,18 +248,19 @@ li:hover {
   justify-content: space-between;
   align-items: center;
 }
+
 /* --- Cleaner, lighter, better integrated form --- */
 #create-task-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.25); /* translucent to match background */
+  background: rgba(255, 255, 255, 0.25);
   padding: 10px 12px;
   border-radius: 6px;
   box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-width: 450px; /* narrower for balance */
-  margin: 0 auto; /* center it */
+  max-width: 450px;
+  margin: 0 auto;
 }
 
 .form-row {
@@ -301,6 +304,8 @@ li:hover {
     width: 100%;
   }
 }
+
+
 footer {
   position: fixed;
   bottom: 0;
@@ -309,25 +314,37 @@ footer {
   background: linear-gradient(90deg, #b2f7b2, #ffb2b2);
   color: #222;
   text-align: center;
-  padding: 4px 0;
-  font-size: 12px;
+  padding: 3px 0;
+  font-size: 11px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  height: 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 footer a {
   color: #222;
   text-decoration: none;
   font-weight: 600;
+  font-size: 11px;
 }
 
 footer a:hover {
   text-decoration: underline;
 }
 
-#footer-quote {
+#quote-text {
   display: block;
   font-style: italic;
   opacity: 0.9;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
+  line-height: 1.2;
+  font-size: 11px;
+}
+
+#quote-author {
+  font-size: 10px;
+  line-height: 1.2;
 }
