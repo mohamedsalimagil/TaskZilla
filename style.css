@@ -361,3 +361,82 @@ footer a:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.task-icon {
+  font-size: 24px;
+  margin-right: 10px;
+  animation: pulse 2s infinite, rotate 4s infinite linear;
+  display: inline-block;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.task-icon {
+  font-size: 24px;
+  margin-right: 10px;
+  animation: pulse 2s infinite, rotate 4s infinite linear;
+  display: inline-block;
+}
+
+.animated-title {
+  background: linear-gradient(45deg, #007acc, #00cc88, #ff6b6b, #ffd93d);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+  display: inline-block;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.writing-pencil {
+  font-size: 24px;
+  margin-right: 5px;
+  animation: writingMotion 1.5s infinite ease-in-out;
+  display: inline-block;
+  position: relative;
+}
+
+.writing-pencil::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #007acc;
+  animation: drawLine 1.5s infinite ease-in-out;
+}
+
+@keyframes writingMotion {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(5px) rotate(-5deg); }
+  50% { transform: translateX(10px) rotate(0deg); }
+  75% { transform: translateX(5px) rotate(5deg); }
+}
+
+@keyframes drawLine {
+  0%, 100% { width: 0; left: 50%; }
+  50% { width: 20px; left: 30%; }
+}
