@@ -1,4 +1,41 @@
+// Add task statistics functionality
+function createTaskStats() {
+  const statsHTML = `
+    <div id="task-stats" class="stats-container">
+      <div class="stat-item">
+        <span class="stat-number" id="total-tasks">0</span>
+        <span class="stat-label">Total Tasks</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="completed-tasks">0</span>
+        <span class="stat-label">Completed</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="pending-tasks">0</span>
+        <span class="stat-label">Pending</span>
+      </div>
+    </div>
+  `;
+  
+  // Insert after the main heading
+  const mainContent = document.getElementById('main-content');
+  const heading = mainContent.querySelector('h1');
+  heading.insertAdjacentHTML('afterend', statsHTML);
+}
+
+function updateTaskStats() {
+  const tasks = document.querySelectorAll('#tasks li');
+  const completedTasks = document.querySelectorAll('#tasks input[type="checkbox"]:checked');
+  
+  document.getElementById('total-tasks').textContent = tasks.length;
+  document.getElementById('completed-tasks').textContent = completedTasks.length;
+  document.getElementById('pending-tasks').textContent = tasks.length - completedTasks.length;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  // Create task statistics first
+  createTaskStats();
+  
   const taskList = document.getElementById("tasks");
   const form = document.getElementById("create-task-form");
   const input = document.getElementById("new-task-description");
@@ -10,109 +47,121 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const BASE_URL = "https://taskzilla-vz2d.onrender.com/tasks";
 
+  // Store the original renderTask function
+  const originalRenderTask = renderTask;
+
+  // Override renderTask to include stats update
+  function renderTask(task) {
+    const li = document.createElement("li");
+    li.className = "task-item";
+    li.setAttribute("data-due-date", task.dueDate);
+    li.style.position = "relative";
+
+    // Apply priority color
+    if (task.priority === "high") li.style.color = "red";
+    else if (task.priority === "medium") li.style.color = "orange";
+    else if (task.priority === "low") li.style.color = "green";
+
+    // Task content container
+    const taskContent = document.createElement("div");
+    taskContent.className = "task-content";
+    taskContent.textContent = `${task.description} (Due: ${task.dueDate}) - Assigned to: ${task.assignedUser}`;
+
+    const badge = document.createElement("span");
+    badge.classList.add("priority-badge", `priority-${task.priority}`);
+    badge.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
+    taskContent.appendChild(badge);
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.style.marginRight = "10px";
+    checkbox.addEventListener("change", () => {
+      taskContent.style.textDecoration = checkbox.checked ? "line-through" : "none";
+      fetch(`${BASE_URL}/${task.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed: checkbox.checked })
+      }).then(() => {
+        updateTaskStats(); // Update stats when task completion changes
+      });
+    });
+
+    // Action menu button
+    const actionMenuBtn = document.createElement("button");
+    actionMenuBtn.textContent = "⋮";
+    actionMenuBtn.className = "action-menu";
+
+    // Dropdown menu
+    const menu = document.createElement("div");
+    menu.className = "action-dropdown";
+    menu.style.display = "none";
+
+    const editOption = document.createElement("button");
+    editOption.textContent = "✏️ Edit Task";
+    editOption.addEventListener("click", () => {
+      const newTask = prompt("Edit task:", task.description);
+      const newDate = prompt("Edit due date:", task.dueDate);
+      const newUser = prompt("Edit assigned user:", task.assignedUser);
+      if (newTask && newDate && newUser) {
+        fetch(`${BASE_URL}/${task.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description: newTask,
+            dueDate: newDate,
+            assignedUser: newUser
+          })
+        }).then(() => {
+          taskContent.textContent = `${newTask} (Due: ${newDate}) - Assigned to: ${newUser}`;
+          taskContent.appendChild(badge);
+          li.setAttribute("data-due-date", newDate);
+        });
+      }
+      menu.style.display = "none";
+    });
+
+    const deleteOption = document.createElement("button");
+    deleteOption.textContent = "❌ Delete Task";
+    deleteOption.addEventListener("click", () => {
+      fetch(`${BASE_URL}/${task.id}`, {
+        method: "DELETE"
+      }).then(() => {
+        li.remove();
+        updateTaskStats(); // Update stats after deletion
+      });
+      menu.style.display = "none";
+    });
+
+    menu.appendChild(editOption);
+    menu.appendChild(deleteOption);
+
+    actionMenuBtn.addEventListener("click", () => {
+      menu.style.display = menu.style.display === "none" ? "block" : "none";
+    });
+
+    const rightSide = document.createElement("div");
+    rightSide.className = "task-controls";
+    rightSide.appendChild(actionMenuBtn);
+    rightSide.appendChild(menu);
+
+    li.appendChild(checkbox);
+    li.appendChild(taskContent);
+    li.appendChild(rightSide);
+
+    taskList.appendChild(li);
+    
+    // Update stats after rendering each task
+    updateTaskStats();
+  }
+
   // Load tasks from backend
   fetch(BASE_URL)
     .then(res => res.json())
     .then(tasks => {
       tasks.forEach(task => renderTask(task));
+      updateTaskStats(); // Final stats update after all tasks loaded
     });
-
-  // Render a task
-  function renderTask(task) {
-  const li = document.createElement("li");
-  li.className = "task-item";
-  li.setAttribute("data-due-date", task.dueDate);
-  li.style.position = "relative";
-
-  // Apply priority color
-  if (task.priority === "high") li.style.color = "red";
-  else if (task.priority === "medium") li.style.color = "orange";
-  else if (task.priority === "low") li.style.color = "green";
-
-  // Task content container
-  const taskContent = document.createElement("div");
-  taskContent.className = "task-content";
-  taskContent.textContent = `${task.description} (Due: ${task.dueDate}) - Assigned to: ${task.assignedUser}`;
-
-  const badge = document.createElement("span");
-  badge.classList.add("priority-badge", `priority-${task.priority}`);
-  badge.textContent = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
-  taskContent.appendChild(badge);
-
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = task.completed;
-  checkbox.style.marginRight = "10px";
-  checkbox.addEventListener("change", () => {
-    taskContent.style.textDecoration = checkbox.checked ? "line-through" : "none";
-    fetch(`${BASE_URL}/${task.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ completed: checkbox.checked })
-    });
-  });
-
-  // Action menu button
-  const actionMenuBtn = document.createElement("button");
-  actionMenuBtn.textContent = "⋮";
-  actionMenuBtn.className = "action-menu";
-
-  // Dropdown menu
-  const menu = document.createElement("div");
-  menu.className = "action-dropdown";
-  menu.style.display = "none";
-
-  const editOption = document.createElement("button");
-  editOption.textContent = "✏️ Edit Task";
-  editOption.addEventListener("click", () => {
-    const newTask = prompt("Edit task:", task.description);
-    const newDate = prompt("Edit due date:", task.dueDate);
-    const newUser = prompt("Edit assigned user:", task.assignedUser);
-    if (newTask && newDate && newUser) {
-      fetch(`${BASE_URL}/${task.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: newTask,
-          dueDate: newDate,
-          assignedUser: newUser
-        })
-      }).then(() => {
-        taskContent.textContent = `${newTask} (Due: ${newDate}) - Assigned to: ${newUser}`;
-        taskContent.appendChild(badge);
-        li.setAttribute("data-due-date", newDate);
-      });
-    }
-    menu.style.display = "none";
-  });
-
-  const deleteOption = document.createElement("button");
-  deleteOption.textContent = "❌ Delete Task";
-  deleteOption.addEventListener("click", () => {
-    fetch(`${BASE_URL}/${task.id}`, {
-      method: "DELETE"
-    }).then(() => li.remove());
-    menu.style.display = "none";
-  });
-
-  menu.appendChild(editOption);
-  menu.appendChild(deleteOption);
-
-  actionMenuBtn.addEventListener("click", () => {
-    menu.style.display = menu.style.display === "none" ? "block" : "none";
-  });
-
-  const rightSide = document.createElement("div");
-  rightSide.className = "task-controls";
-  rightSide.appendChild(actionMenuBtn);
-  rightSide.appendChild(menu);
-
-  li.appendChild(checkbox);
-  li.appendChild(taskContent);
-  li.appendChild(rightSide);
-
-  taskList.appendChild(li);
-}
 
   // Submit new task
   form.addEventListener("submit", function (event) {
@@ -131,7 +180,10 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify(newTask)
     })
       .then(res => res.json())
-      .then(task => renderTask(task));
+      .then(task => {
+        renderTask(task);
+        updateTaskStats(); // Update stats after adding new task
+      });
 
     input.value = "";
     userInput.value = "";
@@ -168,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-//  Auto-close dropdown when clicking outside
+// Auto-close dropdown when clicking outside
 document.addEventListener("click", (event) => {
   const allMenus = document.querySelectorAll(".action-dropdown");
   allMenus.forEach(menu => {
