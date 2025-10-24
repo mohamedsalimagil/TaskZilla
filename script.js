@@ -1,39 +1,59 @@
-// Add task statistics functionality
+// Task statistics functionality with proper DOM manipulation
 function createTaskStats() {
-  const statsHTML = `
-    <div id="task-stats" class="stats-container">
-      <div class="stat-item">
-        <span class="stat-number" id="total-tasks">0</span>
-        <span class="stat-label">Total Tasks</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number" id="completed-tasks">0</span>
-        <span class="stat-label">Completed</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-number" id="pending-tasks">0</span>
-        <span class="stat-label">Pending</span>
-      </div>
-    </div>
-  `;
+  // Create container
+  const statsContainer = document.createElement('div');
+  statsContainer.id = 'task-stats';
+  statsContainer.className = 'stats-container';
+  
+  // Create stat items using proper DOM methods
+  const statData = [
+    { id: 'total-tasks', label: 'Total Tasks' },
+    { id: 'completed-tasks', label: 'Completed' },
+    { id: 'pending-tasks', label: 'Pending' }
+  ];
+  
+  statData.forEach(stat => {
+    const statItem = document.createElement('div');
+    statItem.className = 'stat-item';
+    
+    const statNumber = document.createElement('span');
+    statNumber.className = 'stat-number';
+    statNumber.id = stat.id;
+    statNumber.textContent = '0';
+    
+    const statLabel = document.createElement('span');
+    statLabel.className = 'stat-label';
+    statLabel.textContent = stat.label;
+    
+    statItem.appendChild(statNumber);
+    statItem.appendChild(statLabel);
+    statsContainer.appendChild(statItem);
+  });
   
   // Insert after the main heading
   const mainContent = document.getElementById('main-content');
   const heading = mainContent.querySelector('h1');
-  heading.insertAdjacentHTML('afterend', statsHTML);
+  heading.insertAdjacentElement('afterend', statsContainer);
 }
 
 function updateTaskStats() {
   const tasks = document.querySelectorAll('#tasks li');
   const completedTasks = document.querySelectorAll('#tasks input[type="checkbox"]:checked');
   
-  document.getElementById('total-tasks').textContent = tasks.length;
-  document.getElementById('completed-tasks').textContent = completedTasks.length;
-  document.getElementById('pending-tasks').textContent = tasks.length - completedTasks.length;
+  // Safely update stats if elements exist
+  const totalEl = document.getElementById('total-tasks');
+  const completedEl = document.getElementById('completed-tasks');
+  const pendingEl = document.getElementById('pending-tasks');
+  
+  if (totalEl && completedEl && pendingEl) {
+    totalEl.textContent = tasks.length;
+    completedEl.textContent = completedTasks.length;
+    pendingEl.textContent = tasks.length - completedTasks.length;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Create task statistics first
+  // Create task statistics
   createTaskStats();
   
   const taskList = document.getElementById("tasks");
@@ -47,10 +67,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const BASE_URL = "https://taskzilla-vz2d.onrender.com/tasks";
 
-  // Store the original renderTask function
-  const originalRenderTask = renderTask;
+  // Load tasks from backend
+  fetch(BASE_URL)
+    .then(res => res.json())
+    .then(tasks => {
+      tasks.forEach(task => renderTask(task));
+      updateTaskStats();
+    });
 
-  // Override renderTask to include stats update
+  // Render a task
   function renderTask(task) {
     const li = document.createElement("li");
     li.className = "task-item";
@@ -83,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ completed: checkbox.checked })
       }).then(() => {
-        updateTaskStats(); // Update stats when task completion changes
+        updateTaskStats();
       });
     });
 
@@ -128,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "DELETE"
       }).then(() => {
         li.remove();
-        updateTaskStats(); // Update stats after deletion
+        updateTaskStats();
       });
       menu.style.display = "none";
     });
@@ -151,17 +176,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     taskList.appendChild(li);
     
-    // Update stats after rendering each task
+    // Apply strikethrough if task is completed
+    if (task.completed) {
+      taskContent.style.textDecoration = "line-through";
+    }
+    
     updateTaskStats();
   }
-
-  // Load tasks from backend
-  fetch(BASE_URL)
-    .then(res => res.json())
-    .then(tasks => {
-      tasks.forEach(task => renderTask(task));
-      updateTaskStats(); // Final stats update after all tasks loaded
-    });
 
   // Submit new task
   form.addEventListener("submit", function (event) {
@@ -182,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(res => res.json())
       .then(task => {
         renderTask(task);
-        updateTaskStats(); // Update stats after adding new task
+        updateTaskStats();
       });
 
     input.value = "";
