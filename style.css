@@ -547,3 +547,39 @@ footer a:hover {
     font-size: 2.5rem;
   }
 }
+/* FIX DROPDOWN COLLISION WITH HOVER EFFECT */
+li.task-item {
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+li.task-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 2; /* Keep it low so dropdown can overlap */
+}
+
+/* IMPORTANT: Make sure dropdown has higher z-index */
+.action-dropdown {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 100; /* Higher than task item */
+  min-width: 120px;
+  display: none;
+}
+
+.action-dropdown.show {
+  display: block;
+}
+
+/* When dropdown is open, prevent the hover effect from interfering */
+li.task-item:has(.action-dropdown.show):hover {
+  z-index: 1; /* Keep it low when dropdown is open */
+}
