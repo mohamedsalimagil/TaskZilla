@@ -30,10 +30,10 @@ function createTaskStats() {
     statsContainer.appendChild(statItem);
   });
   
-  // Insert after the main heading
+  // FIXED: Insert after the VIP header, not the h1
   const mainContent = document.getElementById('main-content');
-  const heading = mainContent.querySelector('h1');
-  heading.insertAdjacentElement('afterend', statsContainer);
+  const vipHeader = mainContent.querySelector('.vip-header');
+  vipHeader.insertAdjacentElement('afterend', statsContainer);
 }
 
 function updateTaskStats() {
