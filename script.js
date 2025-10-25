@@ -52,9 +52,268 @@ function updateTaskStats() {
   }
 }
 
+// ==================== FLOATING ACTION BUTTON ====================
+function createFloatingActionButton() {
+  const fab = document.createElement('button');
+  fab.id = 'fab-add-task';
+  fab.className = 'fab';
+  fab.innerHTML = '+';
+  fab.setAttribute('aria-label', 'Add new task');
+  
+  // Create the form container (initially hidden)
+  const formContainer = document.createElement('div');
+  formContainer.id = 'fab-form-container';
+  formContainer.className = 'fab-form-container hidden';
+  
+  // Move the existing form into the container
+  const existingForm = document.getElementById('create-task-form');
+  if (existingForm) {
+    formContainer.appendChild(existingForm);
+    
+    // Add a close button to the form
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'fab-form-close';
+    closeBtn.innerHTML = '×';
+    closeBtn.addEventListener('click', () => {
+      formContainer.classList.add('hidden');
+      fab.classList.remove('hidden');
+    });
+    
+    existingForm.insertBefore(closeBtn, existingForm.firstChild);
+  }
+  
+  // FAB click handler
+  fab.addEventListener('click', () => {
+    formContainer.classList.remove('hidden');
+    fab.classList.add('hidden');
+    // Auto-focus on the input field for better UX
+    const input = document.getElementById('new-task-description');
+    if (input) input.focus();
+  });
+  
+  // Add to main content
+  const mainContent = document.getElementById('main-content');
+  mainContent.appendChild(fab);
+  mainContent.appendChild(formContainer);
+}
+
+// ==================== PREMIUM SIDEBAR FUNCTIONS ====================
+// Create premium sidebar with features
+function createPremiumSidebar() {
+  const sidebar = document.createElement('div');
+  sidebar.className = 'sidebar';
+  
+  // Statistics Section - MOVED INTO SIDEBAR
+  const statsSection = document.createElement('div');
+  statsSection.id = 'task-stats'; // Keep the same ID
+  statsSection.className = 'stats-sidebar'; // Updated class
+  
+  // Create stat items using your existing structure
+  const statData = [
+    { id: 'total-tasks', label: 'Total Tasks' },
+    { id: 'completed-tasks', label: 'Completed' },
+    { id: 'pending-tasks', label: 'Pending' }
+  ];
+  
+  statData.forEach(stat => {
+    const statItem = document.createElement('div');
+    statItem.className = 'stat-item';
+    
+    const statNumber = document.createElement('span');
+    statNumber.className = 'stat-number';
+    statNumber.id = stat.id;
+    statNumber.textContent = '0';
+    
+    const statLabel = document.createElement('span');
+    statLabel.className = 'stat-label';
+    statLabel.textContent = stat.label;
+    
+    statItem.appendChild(statNumber);
+    statItem.appendChild(statLabel);
+    statsSection.appendChild(statItem);
+  });
+  
+  // Quick Actions Section
+  const quickActions = document.createElement('div');
+  quickActions.className = 'quick-actions-sidebar';
+  quickActions.innerHTML = `
+    <h3>Quick Actions</h3>
+    <button id="clear-completed" class="sidebar-btn">🗑️ Clear Completed</button>
+    <button id="mark-all-done" class="sidebar-btn">✅ Mark All Done</button>
+    <button id="export-tasks" class="sidebar-btn">📊 Export to Excel</button>
+  `;
+  
+  // Due Soon Section
+  const dueSoon = document.createElement('div');
+  dueSoon.className = 'due-soon-sidebar';
+  dueSoon.innerHTML = `
+    <h3>🕒 Due Soon</h3>
+    <div id="due-list" class="due-list"></div>
+  `;
+  
+  // Productivity Tip Section
+  const tipSection = document.createElement('div');
+  tipSection.className = 'tip-sidebar';
+  tipSection.innerHTML = `
+    <div class="tip-icon">💡</div>
+    <p id="tip-text">Break large tasks into smaller steps!</p>
+  `;
+  
+  // Assemble sidebar - STATS NOW INSIDE SIDEBAR
+  sidebar.appendChild(statsSection);
+  sidebar.appendChild(quickActions);
+  sidebar.appendChild(dueSoon);
+  sidebar.appendChild(tipSection);
+  
+  // Create main content wrapper
+  const mainArea = document.createElement('div');
+  mainArea.className = 'main-area';
+  
+  // Move existing content to main area BUT EXCLUDE THE FORM
+  const mainContent = document.getElementById('main-content');
+  const elementsToMove = Array.from(mainContent.children).filter(child => 
+    !child.classList.contains('vip-header') && 
+    child.id !== 'task-stats' &&
+    child.id !== 'create-task-form' // EXCLUDE THE FORM
+  );
+  
+  elementsToMove.forEach(element => {
+    mainArea.appendChild(element);
+  });
+  
+  // Create layout container
+  const appLayout = document.createElement('div');
+  appLayout.className = 'app-layout';
+  appLayout.appendChild(sidebar);
+  appLayout.appendChild(mainArea);
+  
+  // Insert after VIP header
+  const vipHeader = document.querySelector('.vip-header');
+  vipHeader.insertAdjacentElement('afterend', appLayout);
+  
+  // Add event listeners for new buttons
+  addSidebarEventListeners();
+}
+
+// Add sidebar functionality
+function addSidebarEventListeners() {
+  document.getElementById('clear-completed')?.addEventListener('click', clearCompletedTasks);
+  document.getElementById('mark-all-done')?.addEventListener('click', markAllDone);
+  document.getElementById('export-tasks')?.addEventListener('click', exportTasks);
+}
+
+// Sidebar functions
+function clearCompletedTasks() {
+  const completedTasks = document.querySelectorAll('#tasks input[type="checkbox"]:checked');
+  completedTasks.forEach(checkbox => {
+    const taskId = checkbox.closest('li').dataset.taskId;
+    fetch(`${BASE_URL}/${taskId}`, { method: 'DELETE' })
+      .then(() => {
+        checkbox.closest('li').remove();
+        updateTaskStats(); // Update the stats in sidebar
+        updateDueSoon(); // Update due soon section
+      });
+  });
+}
+
+function markAllDone() {
+  const checkboxes = document.querySelectorAll('#tasks input[type="checkbox"]:not(:checked)');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = true;
+    checkbox.dispatchEvent(new Event('change'));
+  });
+  updateTaskStats(); // Update the stats in sidebar
+}
+
+function exportTasks() {
+  const tasks = Array.from(document.querySelectorAll('#tasks li')).map(li => {
+    const description = li.querySelector('.task-content').textContent.split(' (Due:')[0];
+    const completed = li.querySelector('input[type="checkbox"]').checked ? 'Yes' : 'No';
+    const dueDate = li.dataset.dueDate || 'No date';
+    const priority = li.style.color === 'red' ? 'High' : 
+                    li.style.color === 'orange' ? 'Medium' : 
+                    li.style.color === 'green' ? 'Low' : 'Unknown';
+    
+    return {
+      Description: description,
+      Completed: completed,
+      'Due Date': dueDate,
+      Priority: priority
+    };
+  });
+
+  // Create CSV content (Excel can open CSV files)
+  const headers = ['Description', 'Completed', 'Due Date', 'Priority'];
+  const csvContent = [
+    headers.join(','), // Header row
+    ...tasks.map(task => [
+      `"${task.Description.replace(/"/g, '""')}"`, // Escape quotes in description
+      task.Completed,
+      `"${task['Due Date']}"`,
+      task.Priority
+    ].join(','))
+  ].join('\n');
+
+  // Create and download the file
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `taskzilla-export-${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Update due soon list
+function updateDueSoon() {
+  const dueList = document.getElementById('due-list');
+  if (!dueList) return;
+  
+  const tasks = Array.from(document.querySelectorAll('#tasks li'));
+  const today = new Date();
+  const dueSoon = tasks.filter(li => {
+    const dueDate = new Date(li.dataset.dueDate);
+    const diffTime = dueDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 3 && diffDays >= 0;
+  }).slice(0, 3); // Show only 3 most urgent
+  
+  dueList.innerHTML = dueSoon.map(li => {
+    const text = li.querySelector('.task-content').textContent;
+    const dueDate = li.dataset.dueDate;
+    return `<div class="due-item">${text.split(' (Due:')[0]}<br><small>Due: ${dueDate}</small></div>`;
+  }).join('') || '<div class="due-item">No urgent tasks! 🎉</div>';
+}
+
+// Update productivity tip
+function updateProductivityTip() {
+  const tips = [
+    "Eat the frog! Do your most important task first.",
+    "Break large tasks into smaller, manageable steps.",
+    "Use the Pomodoro technique: 25min work, 5min break.",
+    "Review your tasks at the end of each day.",
+    "Focus on one task at a time for better productivity.",
+    "Delegate tasks when possible to free up your time.",
+    "Set clear deadlines to stay motivated and focused."
+  ];
+  
+  const tipText = document.getElementById('tip-text');
+  if (tipText) {
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    tipText.textContent = randomTip;
+  }
+}
+
+// ==================== UPDATED DOMCONTENTLOADED ====================
 document.addEventListener("DOMContentLoaded", () => {
-  // Create task statistics
-  createTaskStats();
+  // Create premium sidebar with integrated statistics
+  createPremiumSidebar();
+  
+  // Create floating action button
+  createFloatingActionButton();
   
   const taskList = document.getElementById("tasks");
   const form = document.getElementById("create-task-form");
@@ -73,6 +332,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(tasks => {
       tasks.forEach(task => renderTask(task));
       updateTaskStats();
+      updateDueSoon(); // Initialize due soon section
+      updateProductivityTip(); // Initialize tips
     });
 
   // Render a task
@@ -109,6 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({ completed: checkbox.checked })
       }).then(() => {
         updateTaskStats();
+        updateDueSoon(); // Update due soon when tasks change
       });
     });
 
@@ -141,6 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
           taskContent.textContent = `${newTask} (Due: ${newDate}) - Assigned to: ${newUser}`;
           taskContent.appendChild(badge);
           li.setAttribute("data-due-date", newDate);
+          updateDueSoon(); // Update due soon when tasks change
         });
       }
       menu.style.display = "none";
@@ -154,6 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }).then(() => {
         li.remove();
         updateTaskStats();
+        updateDueSoon(); // Update due soon when tasks change
       });
       menu.style.display = "none";
     });
@@ -204,6 +468,15 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(task => {
         renderTask(task);
         updateTaskStats();
+        updateDueSoon(); // Update due soon when tasks change
+        
+        // Close the form after successful submission
+        const formContainer = document.getElementById('fab-form-container');
+        const fab = document.getElementById('fab-add-task');
+        if (formContainer && fab) {
+          formContainer.classList.add('hidden');
+          fab.classList.remove('hidden');
+        }
       });
 
     input.value = "";
@@ -239,6 +512,12 @@ document.addEventListener("DOMContentLoaded", () => {
     taskList.innerHTML = "";
     tasks.forEach(task => taskList.appendChild(task));
   });
+
+  // Update sidebar features periodically
+  setInterval(() => {
+    updateDueSoon();
+    updateProductivityTip();
+  }, 30000);
 });
 
 // Auto-close dropdown when clicking outside
