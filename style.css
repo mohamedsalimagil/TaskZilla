@@ -1335,3 +1335,37 @@ footer {
   align-items: center;
   justify-content: center;
 }
+/* Form Labels */
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 6px;
+}
+
+.form-label.required::after {
+  content: " *";
+  color: #e74c3c;
+}
+
+/* Form Input Groups */
+.form-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure form rows maintain their flex layout */
+.fab-form-container .form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+/* Make sure inputs fill their containers */
+.fab-form-container .form-input-group input,
+.fab-form-container .form-input-group select {
+  width: 100%;
+  box-sizing: border-box;
+}

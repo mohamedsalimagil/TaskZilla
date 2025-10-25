@@ -65,22 +65,44 @@ function createFloatingActionButton() {
   formContainer.id = 'fab-form-container';
   formContainer.className = 'fab-form-container hidden';
   
-  // Move the existing form into the container
+  // Move the existing form into a temporary variable
   const existingForm = document.getElementById('create-task-form');
   if (existingForm) {
-    formContainer.appendChild(existingForm);
+    // Create form header
+    const formHeader = document.createElement('div');
+    formHeader.className = 'fab-form-header';
+    formHeader.innerHTML = `
+      <h3 class="fab-form-title">Add New Task</h3>
+      <p class="fab-form-subtitle">Fill in the details below</p>
+    `;
     
-    // Add a close button to the form
+    // Enhanced close button
     const closeBtn = document.createElement('button');
     closeBtn.type = 'button';
     closeBtn.className = 'fab-form-close';
     closeBtn.innerHTML = '×';
+    closeBtn.setAttribute('aria-label', 'Close form');
     closeBtn.addEventListener('click', () => {
       formContainer.classList.add('hidden');
       fab.classList.remove('hidden');
     });
     
-    existingForm.insertBefore(closeBtn, existingForm.firstChild);
+    // Create form body
+    const formBody = document.createElement('div');
+    formBody.className = 'fab-form-body';
+    
+    // Move the existing form into the body
+    formBody.appendChild(existingForm);
+    
+    // Add close button to header
+    formHeader.appendChild(closeBtn);
+    
+    // Assemble the form container
+    formContainer.appendChild(formHeader);
+    formContainer.appendChild(formBody);
+    
+    // Add proper labels to form inputs based on your HTML structure
+    addFormLabels(existingForm);
   }
   
   // FAB click handler
@@ -96,6 +118,80 @@ function createFloatingActionButton() {
   const mainContent = document.getElementById('main-content');
   mainContent.appendChild(fab);
   mainContent.appendChild(formContainer);
+}
+
+// Helper function to add labels to form inputs
+function addFormLabels(form) {
+  // Get all form rows
+  const formRows = form.querySelectorAll('.form-row');
+  
+  // First row: Task User and Task Description
+  const firstRow = formRows[0];
+  const userInput = firstRow.querySelector('#task-user');
+  const descInput = firstRow.querySelector('#new-task-description');
+  
+  if (firstRow && userInput && descInput) {
+    // Clear the row and rebuild with labels
+    firstRow.innerHTML = '';
+    
+    // User input group
+    const userGroup = document.createElement('div');
+    userGroup.className = 'form-input-group';
+    userGroup.innerHTML = `
+      <label for="task-user" class="form-label">Assigned To</label>
+      <input type="text" id="task-user" placeholder="e.g. Mohamed">
+    `;
+    
+    // Description input group
+    const descGroup = document.createElement('div');
+    descGroup.className = 'form-input-group';
+    descGroup.innerHTML = `
+      <label for="new-task-description" class="form-label required">Task Description</label>
+      <input type="text" id="new-task-description" placeholder="What needs to be done?" required>
+    `;
+    
+    firstRow.appendChild(userGroup);
+    firstRow.appendChild(descGroup);
+  }
+  
+  // Second row: Priority and Due Date
+  const secondRow = formRows[1];
+  const prioritySelect = secondRow.querySelector('#priority-level');
+  const dateInput = secondRow.querySelector('#due-date');
+  
+  if (secondRow && prioritySelect && dateInput) {
+    // Clear the row and rebuild with labels
+    secondRow.innerHTML = '';
+    
+    // Priority select group
+    const priorityGroup = document.createElement('div');
+    priorityGroup.className = 'form-input-group';
+    priorityGroup.innerHTML = `
+      <label for="priority-level" class="form-label">Priority Level</label>
+      <select id="priority-level">
+        <option value="low">Low Priority</option>
+        <option value="medium">Medium Priority</option>
+        <option value="high">High Priority</option>
+      </select>
+    `;
+    
+    // Date input group
+    const dateGroup = document.createElement('div');
+    dateGroup.className = 'form-input-group';
+    dateGroup.innerHTML = `
+      <label for="due-date" class="form-label required">Due Date</label>
+      <input type="date" id="due-date" required>
+    `;
+    
+    secondRow.appendChild(priorityGroup);
+    secondRow.appendChild(dateGroup);
+  }
+  
+  // Update submit button text
+  const submitBtn = form.querySelector('#add-task-btn');
+  if (submitBtn) {
+    submitBtn.textContent = 'Create Task';
+  }
 }
 
 // ==================== PREMIUM SIDEBAR FUNCTIONS ====================
@@ -204,26 +300,65 @@ function addSidebarEventListeners() {
 }
 
 // Sidebar functions
+// Sidebar functions
 function clearCompletedTasks() {
   const completedTasks = document.querySelectorAll('#tasks input[type="checkbox"]:checked');
   completedTasks.forEach(checkbox => {
     const taskId = checkbox.closest('li').dataset.taskId;
-    fetch(`${BASE_URL}/${taskId}`, { method: 'DELETE' })
+    fetch(`https://taskzilla-vz2d.onrender.com/tasks/${taskId}`, { method: 'DELETE' })
       .then(() => {
         checkbox.closest('li').remove();
         updateTaskStats(); // Update the stats in sidebar
         updateDueSoon(); // Update due soon section
+      })
+      .catch(error => {
+        console.error('Error deleting task:', error);
+        // Fallback: remove from UI anyway
+        checkbox.closest('li').remove();
+        updateTaskStats();
+        updateDueSoon();
       });
   });
 }
 
 function markAllDone() {
   const checkboxes = document.querySelectorAll('#tasks input[type="checkbox"]:not(:checked)');
+  const updatePromises = [];
+  
   checkboxes.forEach(checkbox => {
+    const taskId = checkbox.closest('li').dataset.taskId;
     checkbox.checked = true;
-    checkbox.dispatchEvent(new Event('change'));
+    
+    // Update in backend
+    const updatePromise = fetch(`https://taskzilla-vz2d.onrender.com/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ completed: true })
+    })
+    .then(() => {
+      // Update UI
+      const taskContent = checkbox.closest('li').querySelector('.task-content');
+      if (taskContent) {
+        taskContent.style.textDecoration = "line-through";
+      }
+    })
+    .catch(error => {
+      console.error('Error updating task:', error);
+      // Still update UI even if backend fails
+      const taskContent = checkbox.closest('li').querySelector('.task-content');
+      if (taskContent) {
+        taskContent.style.textDecoration = "line-through";
+      }
+    });
+    
+    updatePromises.push(updatePromise);
   });
-  updateTaskStats(); // Update the stats in sidebar
+  
+  // Wait for all updates to complete
+  Promise.all(updatePromises).then(() => {
+    updateTaskStats(); // Update the stats in sidebar
+    updateDueSoon(); // Update due soon section
+  });
 }
 
 function exportTasks() {
