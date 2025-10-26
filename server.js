@@ -31,6 +31,9 @@ server.get('/api/quote', async (req, res) => {
     console.error(' Quote API failed, using fallback:', error);
     
     const fallbackQuotes = [
+      { content: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+      { content: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+      { content: "Keep pushing forward, no matter what.", author: "TaskZilla Team" },
       { content: "That which does not kill us makes us stronger.", author: "TaskZilla Team" },
       { content: "Fall seven times, stand up eight.", author: "TaskZilla Team" },
       { content: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
