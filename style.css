@@ -1400,3 +1400,134 @@ footer {
   background: linear-gradient(90deg, #3498db, #9b59b6, #e74c3c);
   animation: vipDraw 2s ease-out 0.5s forwards;
 }
+/* ==================== COLORFUL TASK CLOCK STYLES ==================== */
+.task-clock {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 20px 25px;
+  margin: 0 auto 25px auto;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 320px;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+  animation: clockGlow 3s ease-in-out infinite alternate;
+  z-index: 5; /* Lower than VIP header */
+}
+
+/* Remove the problematic shine animation that was causing vertical issues */
+.task-clock::before {
+  display: none; /* Remove the shine effect */
+}
+
+.clock-time {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 5px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+  position: relative;
+  z-index: 2;
+}
+
+.clock-date {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+.clock-greeting {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+}
+
+/* Simplified glow animation */
+@keyframes clockGlow {
+  0% {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  }
+  100% {
+    box-shadow: 0 8px 35px rgba(102, 126, 234, 0.6);
+  }
+}
+
+/* Hover effects */
+.task-clock:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.7);
+}
+
+/* Keep the pulse animation for seconds but make it more subtle */
+.clock-time::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #ffeb3b;
+  border-radius: 50%;
+  margin-left: 5px;
+  animation: pulse 1s infinite;
+  vertical-align: middle;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.9); }
+}
+
+/* Ensure VIP header has higher z-index */
+.vip-header {
+  position: relative;
+  z-index: 10; /* Higher than clock */
+}
+
+/* Make sure the neon line stays intact */
+.vip-underline {
+  position: absolute;
+  z-index: 10;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .task-clock {
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    max-width: 280px;
+  }
+  
+  .clock-time {
+    font-size: 26px;
+  }
+  
+  .clock-date {
+    font-size: 14px;
+  }
+  
+  .clock-greeting {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .task-clock {
+    padding: 15px 18px;
+    max-width: 250px;
+  }
+  
+  .clock-time {
+    font-size: 22px;
+  }
+}

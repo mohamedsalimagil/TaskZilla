@@ -441,7 +441,85 @@ function updateProductivityTip() {
     tipText.textContent = randomTip;
   }
 }
-
+// ==================== COLORFUL CLOCK FUNCTIONALITY ====================
+function createClock() {
+  const clockContainer = document.createElement('div');
+  clockContainer.id = 'task-clock';
+  clockContainer.className = 'task-clock';
+  
+  const timeDisplay = document.createElement('div');
+  timeDisplay.className = 'clock-time';
+  
+  const dateDisplay = document.createElement('div');
+  dateDisplay.className = 'clock-date';
+  
+  const greetingDisplay = document.createElement('div');
+  greetingDisplay.className = 'clock-greeting';
+  
+  clockContainer.appendChild(timeDisplay);
+  clockContainer.appendChild(dateDisplay);
+  clockContainer.appendChild(greetingDisplay);
+  
+  // Insert above the task list
+  const taskList = document.getElementById('list');
+  taskList.parentNode.insertBefore(clockContainer, taskList);
+  
+  // Update clock every second
+  function updateClock() {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    // Time formatting
+    const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    const timeString = now.toLocaleTimeString([], timeOptions);
+    
+    // Date formatting
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateString = now.toLocaleDateString([], dateOptions);
+    
+    // Dynamic greeting based on time
+    let greeting = '';
+    if (hour < 12) greeting = '🌅 Good Morning!';
+    else if (hour < 18) greeting = '☀️ Good Afternoon!';
+    else greeting = '🌙 Good Evening!';
+    
+    timeDisplay.textContent = timeString;
+    dateDisplay.textContent = dateString;
+    greetingDisplay.textContent = greeting;
+    
+    // Dynamic color change based on time
+    updateClockColors(hour);
+  }
+  
+  function updateClockColors(hour) {
+    const clock = document.getElementById('task-clock');
+    const colors = getTimeBasedColors(hour);
+    clock.style.background = colors.background;
+    clock.style.borderColor = colors.border;
+  }
+  
+  function getTimeBasedColors(hour) {
+    if (hour < 6) return { // Night
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      border: '#5a6fd8'
+    };
+    if (hour < 12) return { // Morning
+      background: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+      border: '#ff7b7f'
+    };
+    if (hour < 18) return { // Afternoon
+      background: 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
+      border: '#8bb3fc'
+    };
+    return { // Evening
+      background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      border: '#f95c8b'
+    };
+  }
+  
+  updateClock();
+  setInterval(updateClock, 1000);
+}
 // ==================== UPDATED DOMCONTENTLOADED ====================
 document.addEventListener("DOMContentLoaded", () => {
   // Create premium sidebar with integrated statistics
@@ -460,7 +538,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const sortBtn = document.getElementById("sort-btn");
 
   const BASE_URL = "https://taskzilla-vz2d.onrender.com/tasks";
-
+ //clock
+  createClock();
   // Load tasks from backend
   fetch(BASE_URL)
     .then(res => res.json())
