@@ -1369,3 +1369,34 @@ footer {
   width: 100%;
   box-sizing: border-box;
 }
+/* Adjust the dinosaur position to be above the line */
+.dino-vip {
+  position: absolute;
+  top: -29px; /* Changed from -10px to -25px to position it higher */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 45px;
+  animation: vipDino 6s infinite ease-in-out;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  z-index: 10;
+}
+
+/* Keep the header adjustments but ensure the dinosaur sits above */
+.vip-header {
+  position: relative;
+  text-align: center;
+  margin: 20px 0 15px 0;
+  padding: 40px 0 30px 0;
+}
+
+/* Make sure the underline stays properly positioned */
+.vip-underline {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3498db, #9b59b6, #e74c3c);
+  animation: vipDraw 2s ease-out 0.5s forwards;
+}
