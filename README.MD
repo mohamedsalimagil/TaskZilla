@@ -80,6 +80,9 @@ Install dependencies:
 npm install
 npm install node-fetch
 ```
+Create a local database file:
+```bash
+echo '{"tasks": []}' > db.json
 
 Start a local JSON server (or run your full backend with quotes):
 ```bash
