@@ -31,6 +31,7 @@ server.get('/api/quote', async (req, res) => {
     console.error(' Quote API failed, using fallback:', error);
     
     const fallbackQuotes = [
+      { content: "Don't watch the clock; do what it does. Keep going.", author: "TaskZilla Team" },
       { content: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
       { content: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
       { content: "Keep pushing forward, no matter what.", author: "TaskZilla Team" },
