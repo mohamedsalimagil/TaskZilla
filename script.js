@@ -304,17 +304,27 @@ function addSidebarEventListeners() {
 function clearCompletedTasks() {
   const completedTasks = document.querySelectorAll('#tasks input[type="checkbox"]:checked');
   completedTasks.forEach(checkbox => {
-    const taskId = checkbox.closest('li').dataset.taskId;
+    const li = checkbox.closest('li');
+    const taskId = li && li.dataset.taskId;
+    if (!taskId) {
+      // Fallback: remove from UI if no id
+      li?.remove();
+      updateTaskStats();
+      updateDueSoon();
+      return;
+    }
+
     fetch(`https://taskzilla-vz2d.onrender.com/tasks/${taskId}`, { method: 'DELETE' })
-      .then(() => {
-        checkbox.closest('li').remove();
+      .then(res => {
+        if (!res.ok) throw new Error('Delete failed');
+        li.remove();
         updateTaskStats(); // Update the stats in sidebar
         updateDueSoon(); // Update due soon section
       })
       .catch(error => {
         console.error('Error deleting task:', error);
         // Fallback: remove from UI anyway
-        checkbox.closest('li').remove();
+        li.remove();
         updateTaskStats();
         updateDueSoon();
       });
@@ -326,18 +336,27 @@ function markAllDone() {
   const updatePromises = [];
   
   checkboxes.forEach(checkbox => {
-    const taskId = checkbox.closest('li').dataset.taskId;
+    const li = checkbox.closest('li');
+    const taskId = li && li.dataset.taskId;
     checkbox.checked = true;
     
+    if (!taskId) {
+      // update UI only if no id
+      const taskContent = li.querySelector('.task-content');
+      if (taskContent) taskContent.style.textDecoration = "line-through";
+      return;
+    }
+
     // Update in backend
     const updatePromise = fetch(`https://taskzilla-vz2d.onrender.com/tasks/${taskId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ completed: true })
     })
-    .then(() => {
+    .then(res => {
+      if (!res.ok) throw new Error('Patch failed');
       // Update UI
-      const taskContent = checkbox.closest('li').querySelector('.task-content');
+      const taskContent = li.querySelector('.task-content');
       if (taskContent) {
         taskContent.style.textDecoration = "line-through";
       }
@@ -345,7 +364,7 @@ function markAllDone() {
     .catch(error => {
       console.error('Error updating task:', error);
       // Still update UI even if backend fails
-      const taskContent = checkbox.closest('li').querySelector('.task-content');
+      const taskContent = li.querySelector('.task-content');
       if (taskContent) {
         taskContent.style.textDecoration = "line-through";
       }
@@ -542,12 +561,21 @@ document.addEventListener("DOMContentLoaded", () => {
   createClock();
   // Load tasks from backend
   fetch(BASE_URL)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error(`Failed to fetch tasks: ${res.status}`);
+      return res.json();
+    })
     .then(tasks => {
+      // Clear any existing list before rendering
+      taskList.innerHTML = '';
       tasks.forEach(task => renderTask(task));
       updateTaskStats();
       updateDueSoon(); // Initialize due soon section
       updateProductivityTip(); // Initialize tips
+    })
+    .catch(err => {
+      console.error('Error loading tasks:', err);
+      // keep the UI usable even if backend fails
     });
 
   // Render a task
@@ -555,6 +583,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const li = document.createElement("li");
     li.className = "task-item";
     li.setAttribute("data-due-date", task.dueDate);
+    // <-- IMPORTANT: store the id so other actions can reference it
+    if (task.id !== undefined) li.dataset.taskId = task.id;
     li.style.position = "relative";
 
     // Apply priority color
@@ -578,13 +608,24 @@ document.addEventListener("DOMContentLoaded", () => {
     checkbox.style.marginRight = "10px";
     checkbox.addEventListener("change", () => {
       taskContent.style.textDecoration = checkbox.checked ? "line-through" : "none";
-      fetch(`${BASE_URL}/${task.id}`, {
+      const id = li.dataset.taskId;
+      if (!id) {
+        updateTaskStats();
+        updateDueSoon();
+        return;
+      }
+      fetch(`https://taskzilla-vz2d.onrender.com/tasks/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ completed: checkbox.checked })
-      }).then(() => {
+      }).then(res => {
+        if (!res.ok) throw new Error('Failed to update completed status');
         updateTaskStats();
         updateDueSoon(); // Update due soon when tasks change
+      }).catch(err => {
+        console.error('Error patching completion:', err);
+        updateTaskStats();
+        updateDueSoon();
       });
     });
 
@@ -605,7 +646,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const newDate = prompt("Edit due date:", task.dueDate);
       const newUser = prompt("Edit assigned user:", task.assignedUser);
       if (newTask && newDate && newUser) {
-        fetch(`${BASE_URL}/${task.id}`, {
+        const id = li.dataset.taskId;
+        if (!id) {
+          // UI-only fallback
+          taskContent.textContent = `${newTask} (Due: ${newDate}) - Assigned to: ${newUser}`;
+          taskContent.appendChild(badge);
+          li.setAttribute("data-due-date", newDate);
+          updateDueSoon();
+          menu.style.display = "none";
+          return;
+        }
+        fetch(`https://taskzilla-vz2d.onrender.com/tasks/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -613,11 +664,14 @@ document.addEventListener("DOMContentLoaded", () => {
             dueDate: newDate,
             assignedUser: newUser
           })
-        }).then(() => {
+        }).then(res => {
+          if (!res.ok) throw new Error('Failed to patch task');
           taskContent.textContent = `${newTask} (Due: ${newDate}) - Assigned to: ${newUser}`;
           taskContent.appendChild(badge);
           li.setAttribute("data-due-date", newDate);
           updateDueSoon(); // Update due soon when tasks change
+        }).catch(err => {
+          console.error('Error editing task:', err);
         });
       }
       menu.style.display = "none";
@@ -626,12 +680,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteOption = document.createElement("button");
     deleteOption.textContent = "❌ Delete Task";
     deleteOption.addEventListener("click", () => {
-      fetch(`${BASE_URL}/${task.id}`, {
+      const id = li.dataset.taskId;
+      if (!id) {
+        li.remove();
+        updateTaskStats();
+        updateDueSoon();
+        menu.style.display = "none";
+        return;
+      }
+      fetch(`https://taskzilla-vz2d.onrender.com/tasks/${id}`, {
         method: "DELETE"
-      }).then(() => {
+      }).then(res => {
+        if (!res.ok) throw new Error('Failed to delete task');
         li.remove();
         updateTaskStats();
         updateDueSoon(); // Update due soon when tasks change
+      }).catch(err => {
+        console.error('Error deleting task:', err);
+        // fallback: remove UI
+        li.remove();
+        updateTaskStats();
+        updateDueSoon();
       });
       menu.style.display = "none";
     });
@@ -678,8 +747,12 @@ document.addEventListener("DOMContentLoaded", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newTask)
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Failed to create task: ${res.status}`);
+        return res.json();
+      })
       .then(task => {
+        // render returned task (with id)
         renderTask(task);
         updateTaskStats();
         updateDueSoon(); // Update due soon when tasks change
@@ -691,6 +764,10 @@ document.addEventListener("DOMContentLoaded", () => {
           formContainer.classList.add('hidden');
           fab.classList.remove('hidden');
         }
+      })
+      .catch(err => {
+        console.error('Error creating task:', err);
+        // Optionally, show a user-facing error
       });
 
     input.value = "";
