@@ -1,1 +1,29 @@
-{"tasks": []}
+{
+  "tasks": [
+    {
+      "id": 1,
+      "description": "Finish TaskZilla persistence",
+      "priority": "high",
+      "dueDate": "2025-10-30",
+      "assignedUser": "Mohamed",
+      "completed": false
+    },
+    {
+      "id": 2,
+      "description": "Implement user authentication",
+      "priority": "medium",
+      "dueDate": "2025-11-15",
+      "assignedUser": "Rising Stackers",
+      "completed": false
+    },
+    {
+      "id": 3,
+      "description": "Design mobile app interface",
+      "priority": "low",
+      "dueDate": "2025-12-01",
+      "assignedUser": "Mohamed",
+      "completed": false
+    }
+  ]
+}
+
