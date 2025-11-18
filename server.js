@@ -38,6 +38,7 @@ server.get('/api/quote', async (req, res) => {
       { content: "That which does not kill us makes us stronger.", author: "TaskZilla Team" },
       { content: "Fall seven times, stand up eight.", author: "TaskZilla Team" },
       { content: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
+      { content: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
       { content: "Life is what happens when you're busy making other plans.", author: "John Lennon" }
     ];
     
